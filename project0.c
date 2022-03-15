@@ -4,7 +4,7 @@
 unsigned long Led;
 
 void Delay(void){unsigned long volatile time;
-  time = 3200000;
+  time = 1600000;
   while(time){
 		time--;
   }
