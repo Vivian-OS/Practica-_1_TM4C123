@@ -1,22 +1,29 @@
 //GPIO interrupciones
 //Vivian Odette Salinas Benavídez
-//Microcontroladores
-//Usar puerto E para interrupciones
 
 #include "lib/include.h"
-
 extern void Configurar_GPIO_D(void)
 {
-SYSCTL-> RCGCPIO |=(1<<3);
-while ((SYSCTL->PRGPIO&0x00000008)==){;}
+SYSCTL -> RCGCGPIO |=(1<<3);
+//while ((SYSCTL->RCGCGPIO&0x00000008)==){;}
+
+GPIOD->LOCK = 0x4C4F434B; //desbloquea los puertos para escribir*
+GPIOD->CR = (1<<0); // el pin 0 desbloque
+
 
 GPIOD->DIR    |=(0<<5)|(1<<1)|(1<<0);
 GPIOD->PUR    |=(1<<5); //estado alto
 GPIOD-> AFSEL |= 0x00;
-GPIOE->PCTL   |= 0x00;
+GPIOD->PCTL   |= 0x00;
 GPIOD->DEN    |=(1<<5)|(1<<1)|(1<<0);
-
+}
 // habilitacion de interrupciones
+
+extern void habilitar_IntGPIO(void){
+
+    NVIC ->IP[1] = (NVIC->IP[1] & 0xFFFFFF00) | (0x00100000);
+    NVIC ->ISER[0] = 0x8;
+
 
    GPIOD->IM |= (0<<1) | (0<<0); //desactivamos el envio de la interrupcion al micro
    GPIOD->IS |= (0<<1) | (0<<0); //interrumpe cuandi sea posible al borde
@@ -25,16 +32,14 @@ GPIOD->DEN    |=(1<<5)|(1<<1)|(1<<0);
    GPIOD ->RIS |= (0<<4)|(0<<0); //registro de estado
   // GPIOD->IM |= (1<<0) | (1<<0);  //Se le ordena enviar la interrupcion al micro
 
- GPIOF->LOCK = 0x4C4F434B; //desbloquea los puertos para escribir*
- GPIOF_CR = (1<<0); // el pin 0 desbloque
+
 }
-extern void GPIOD_ISR(void);
+extern void GPIOD_ISR(void)
 {
     uint32_t i;
-    GPIO->DATA = (1<<0); //led externo  D0
+    GPIOD -> DATA = (1<<0); //led externo  D0
     for (i = 0; i<000000;i++){}
-    GPIO->DATA = (0<<0);
+    GPIOD ->DATA = (0<<0);
     for (i = 0; i<000000;i++){}
+
     }
-
-
